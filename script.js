@@ -2,19 +2,13 @@ Number.prototype.map = function (in_min, in_max, out_min, out_max) {
     return (this - in_min) * (out_max - out_min) / (in_max - in_min) + out_min;
 }
 let dataset = `
-21 15.5
-33.5 25
-47 34
-60.5 49.5
-73 43
-`;/*`
 0 0
 12 10.5
 36 23
 54.5 31.5
 24.5 16
 32 22
-`;*/
+`;
 const Data = dataset.trim().split('\n').map(x => x.trim()).map(x => {
     let parts = x.split(' ').map(x => parseFloat(x));
     return {
@@ -74,10 +68,12 @@ let bias = 0;
 function rnd(a) {
     return a[Math.floor(Math.random() * a.length)];
 }
+let avg = arr => arr.reduce((a, b) => a + b) / arr.length;
 let t = 0
-let lr = 0.1;
+let lr = 0.01;
 function train() {
     let lr2 = lr
+    let lrs = []
     t++
     let gradients = 0;
     let errors = 0;
@@ -85,7 +81,7 @@ function train() {
         let data = Data[i];
         let answer = data.input * weight + bias
         let error = Math.sign(data.target - answer);
-        lr2 += Math.abs(data.target - answer)
+        lrs.push(data.target - answer)
 
         let gradient = error * data.input;
         gradients += (gradient);
@@ -93,6 +89,7 @@ function train() {
     }
     // bias += errors / Data.length * lr;
     // console.log(gradient);
+    lr2 = avg(lrs);
     weight += gradients * (lr2 / Data.length) / Data.length;
 }
 
